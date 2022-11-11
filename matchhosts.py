@@ -18,7 +18,7 @@ for opt, arg in opts:
     if opt == '-h':
         print ('''
         Welcome to CAMM!
-        (Collin's Automated Machine Manager)
+        (Collin's Automated Machine Monitor)
         This little program will continually scan a subnet and keep an active list of computer up to date and remove anything it's been unable to contact for more than 90 days.
         The pioneers used to drive this baby for miles.
 
