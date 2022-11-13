@@ -5,7 +5,7 @@ services:
     image: cammdocker
     tty: true
     environment:
-      - RUNTIMER='*/5 * * * *'
+      - RUNTIMER=''*/5 * * * *''
       - SUBNETS=192.168.2.0/24
     volumes:
       - /home/collinp/camm/data:/data

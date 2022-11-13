@@ -15,7 +15,8 @@ RUN apt update && \
     apt install -qy software-properties-common && \
     apt install -qy python3-pip && \
     apt install -qy curl && \
-    apt install -qy cron
+    apt install -qy cron && \
+    apt install -qy supervisor
 # Install a basic SSH server
 #     apt install -qy openssh-server && \
 #     sed -i 's|session    required     pam_loginuid.so|session    optional     pam_loginuid.so|g' /etc/pam.d/sshd && \
@@ -38,6 +39,7 @@ RUN git clone https://github.com/madeofpendletonwool/camm.git && \
     cp -R camm /data && \
     cp /camm/setup.sh / &&\
     chmod 777 /setup.sh
+COPY /camm/supervisord.conf /etc/supervisord.conf
 # Begin CAM Setup
 # RUN (crontab -l 2>/dev/null; echo "@reboot /data/camm/setup.sh $RUNTIMER $SUBNETS") | crontab -
 #     # crontab -l > cammbootcron && \
@@ -45,4 +47,6 @@ RUN git clone https://github.com/madeofpendletonwool/camm.git && \
 #     # echo "@reboot /data/setup.sh $RUNTIMER $SUBNETS" >> cammbootcron && \
 #     #install new cron file
 #     # crontab cammbootcron
-ENTRYPOINT ["/setup.sh", "RUNTIMER", "SUBNETS"]
+# ENTRYPOINT /bin/bash -c "echo test"
+ENTRYPOINT /bin/bash -c "(crontab -l 2>/dev/null; echo '$RUNTIMER /usr/bin/python3 /data/CAMM.py $SUBNETS') | crontab -" && supervisord /etc/supervisord.conf
+CMD tail -f /dev/null
