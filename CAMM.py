@@ -42,13 +42,12 @@ match_subnet = '10.0.0.0/24'
 print (f'Number of arguments:', len(sys.argv), 'arguments.')
 
 def pull_current_list(working_list):
-    path = 'Computer_list.txt'
-    isExist = os.path.exists(path)
+    isExist = os.path.exists('/data/Computer_list.txt')
     if isExist == True:
         current_list = open('/data/Computer_list.txt').read().splitlines()
         return current_list
     if isExist == False:
-        create_file = open("/dataComputer_list.txt","w")
+        create_file = open("/data/Computer_list.txt","w")
         create_file.write(str(working_list))
         create_file.close()
         current_list = open('/data/Computer_list.txt').read().splitlines()
@@ -59,7 +58,7 @@ def pull_current_list(working_list):
 
 # if 
 def get_working_list(current_list):
-    nmap_search = f"sudo nmap -sP {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
+    nmap_search = f"nmap -sP {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
     # found_machines = os.system(nmap_search)
     found_machines = os.popen(nmap_search).read()
     # print(found_machines)
@@ -79,7 +78,7 @@ def get_working_list(current_list):
     remove_old(working_list, current_list)
     #compare new and old lists, updating final list to add on new entries
     compare_lists(working_list, current_list)
-    os.remove("found.txt")
+    os.remove("/data/found.txt")
 
 def remove_old(working_list, current_list):
     for _ in range(len(current_list)):
