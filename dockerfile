@@ -36,7 +36,7 @@ RUN apt update && \
 # Put camm Files in place
 RUN git clone https://github.com/madeofpendletonwool/camm.git && \
     cp -R camm /data && \
-    cp /camm/setup.sh /
+    cp /camm/setup.sh / &&\
     chmod 777 /setup.sh
 # Begin CAM Setup
 # RUN (crontab -l 2>/dev/null; echo "@reboot /data/camm/setup.sh $RUNTIMER $SUBNETS") | crontab -
