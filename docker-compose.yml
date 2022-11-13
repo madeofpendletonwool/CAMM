@@ -3,6 +3,7 @@ version: '3'
 services:
   camm:
     image: cammdocker
+    container_name: camm
     tty: true
     environment:
       - RUNTIMER=''*/5 * * * *''

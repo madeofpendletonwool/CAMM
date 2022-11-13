@@ -26,7 +26,7 @@ for opt, arg in opts:
 
         Here's an example of how to run the program:
 
-        "CAMM.py -s <subnetlist> ex. CAMM.py \'10.0.0.0/24 192.168.2.0/24\' 
+        "CAMM.py -s <subnetlist> ex. CAMM.py -s \'10.0.0.0/24 192.168.2.0/24\' 
         Don't forget the quotes. They are a requirment if passing more than one subnet to scan."
         ''')
         sys.exit()
@@ -45,13 +45,13 @@ def pull_current_list(working_list):
     path = 'Computer_list.txt'
     isExist = os.path.exists(path)
     if isExist == True:
-        current_list = open('Computer_list.txt').read().splitlines()
+        current_list = open('/data/Computer_list.txt').read().splitlines()
         return current_list
     if isExist == False:
-        create_file = open("Computer_list.txt","w")
+        create_file = open("/dataComputer_list.txt","w")
         create_file.write(str(working_list))
         create_file.close()
-        current_list = open('Computer_list.txt').read().splitlines()
+        current_list = open('/data/Computer_list.txt').read().splitlines()
         # print(working_list)
         return current_list
 
@@ -64,11 +64,11 @@ def get_working_list(current_list):
     found_machines = os.popen(nmap_search).read()
     # print(found_machines)
 
-    create_file = open("found.txt","w")
+    create_file = open("/data/found.txt","w")
     create_file.write(str(found_machines))
     create_file.close()
 
-    working_list = open('found.txt').read().splitlines()
+    working_list = open('/data/found.txt').read().splitlines()
     for _ in range(len(working_list)):
         working_list[_] = working_list[_] + f", {today}"
     # print(working_list)
@@ -91,7 +91,7 @@ def remove_old(working_list, current_list):
         # Delete lines that are older than 90 days prior
         if list_dates < prev:
             print(f'{list_dates} older than 90 days. Removing {current_list[_]}')
-            with open("Computer_list.txt", "w") as fp:
+            with open("/data/Computer_list.txt", "w") as fp:
                 for line in current_list:
                     # print(current_list[_])
                     if line.strip("\n") != current_list[_]:
@@ -105,7 +105,7 @@ def compare_lists(working_list, current_list):
 
     # print('missing:', missing_machines)
 
-    with open(r'Computer_list.txt', 'a') as write_to:
+    with open(r'/data/Computer_list.txt', 'a') as write_to:
         for item in missing_machines:
             # write each item on a new line
             write_to.write("%s\n" % item)

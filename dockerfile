@@ -36,7 +36,7 @@ RUN apt update && \
 #     chown -R camm:camm /home/camm/.ssh/
 # Put camm Files in place
 RUN git clone https://github.com/madeofpendletonwool/camm.git && \
-    cp -R camm /data && \
+    cp -R /camm /data && \
     cp /camm/setup.sh / && \
     chmod 777 /setup.sh && \
     cp /camm/supervisord.conf /etc/supervisord.conf
@@ -48,5 +48,4 @@ RUN git clone https://github.com/madeofpendletonwool/camm.git && \
 #     #install new cron file
 #     # crontab cammbootcron
 # ENTRYPOINT /bin/bash -c "echo test"
-ENTRYPOINT /bin/bash -c "(crontab -l 2>/dev/null; echo '$RUNTIMER /usr/bin/python3 /data/CAMM.py $SUBNETS') | crontab -" && tail -f /dev/null
-CMD tail -f /dev/null
+ENTRYPOINT /bin/bash -c "(crontab -l 2>/dev/null; echo '$RUNTIMER /usr/bin/python3 /data/CAMM.py -s $SUBNETS') | crontab -" && tail -f /dev/null
