@@ -12,3 +12,7 @@ Here's an example of how to run the program:
 
 CAMM.py -s <subnetlist> ex. CAMM.py '10.0.0.0/24 192.168.2.0/24' 
 Don't forget the quotes. They are a requirment if passing more than one subnet to scan.
+
+### Vars
+$RUNTIMER 
+$SUBNETS

@@ -1,0 +1,19 @@
+ 
+version: '3'
+services:
+  camm:
+    image: cammdocker
+    tty: true
+    environment:
+      - RUNTIMER=*/5 * * * *
+      - SUBNETS=192.168.2.0/24
+    volumes:
+      - /home/collinp/camm/data:/data
+    # ports:
+    #   - "3000:3000"
+    restart: always
+
+# volumes:
+#   # Volume for PostgreSQL/MySQL database
+#   database:
+#   uploads:
