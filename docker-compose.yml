@@ -6,15 +6,14 @@ services:
     container_name: camm
     tty: true
     environment:
-      - RUNTIMER=''*/5 * * * *''
-      - SUBNETS=192.168.2.0/24
+      # Default run timer is set to half a day. You adjust as you'd like. Just do it in cron format.
+      - RUNTIMER=''0 */6 * * *''
+      # Subnets should be in / format ex. '10.0.0.0/24 192.168.2.0/24' - 
+      # You can include as many as you want to scan
+      - SUBNETS=''subnet1 subnet2 subnet3'' 
     volumes:
-      - /home/collinp/camm/data:/data
-    # ports:
-    #   - "3000:3000"
+      # Create a folder on your host machine that you'd like the scan file to go into and then 
+      # mount it here. Leave the second folder alone. The /data part is where the container puts
+      # the scanned data.
+      - /your/data/path/data:/data
     restart: always
-
-# volumes:
-#   # Volume for PostgreSQL/MySQL database
-#   database:
-#   uploads:
