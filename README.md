@@ -1,5 +1,7 @@
 <h1 align='center'> CAMM <h1> 
-<img align='center' src="./images/cammlogo.png">
+<p align="center">
+<img src="./images/cammlogo.png">
+</p>
 
 ## Collin's Automatic Machine Monitor
  
