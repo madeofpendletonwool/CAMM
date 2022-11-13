@@ -1,5 +1,6 @@
 <h1 align='center'> CAMM <h1> 
-## aka Collin's Automatic Machine Monitor
+
+## Collin's Automatic Machine Monitor
  
 ### Welcome to CAMM!
 
