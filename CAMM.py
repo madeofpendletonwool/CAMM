@@ -41,17 +41,17 @@ print ('Subnets we will scan:', subnet_list)
 match_subnet = '10.0.0.0/24'
 print (f'Number of arguments:', len(sys.argv), 'arguments.')
 
-def pull_current_list(working_list):
+def pull_current_list(working_lines):
+    test_data = ''
     isExist = os.path.exists('/data/Computer_list.txt')
     if isExist == True:
         current_list = open('/data/Computer_list.txt').read().splitlines()
         return current_list
     if isExist == False:
         create_file = open("/data/Computer_list.txt","w")
-        create_file.write(str(working_list))
+        create_file.write(str(working_lines))
         create_file.close()
         current_list = open('/data/Computer_list.txt').read().splitlines()
-        # print(working_list)
         return current_list
 
 
@@ -61,7 +61,6 @@ def get_working_list(current_list):
     nmap_search = f"nmap -sP {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
     # found_machines = os.system(nmap_search)
     found_machines = os.popen(nmap_search).read()
-    # print(found_machines)
 
     create_file = open("/data/found.txt","w")
     create_file.write(str(found_machines))
@@ -70,10 +69,10 @@ def get_working_list(current_list):
     working_list = open('/data/found.txt').read().splitlines()
     for _ in range(len(working_list)):
         working_list[_] = working_list[_] + f", {today}"
-    # print(working_list)
+    # Break working list into lines
+    working_lines = ('\n'.join(working_list))
 
-    # print(working_list)
-    current_list = pull_current_list(working_list)
+    current_list = pull_current_list(working_lines)
     #remove old entries that haven't been updated
     remove_old(working_list, current_list)
     #compare new and old lists, updating final list to add on new entries
@@ -83,16 +82,13 @@ def get_working_list(current_list):
 def remove_old(working_list, current_list):
     for _ in range(len(current_list)):
         list_dates = current_list[_][-10:]
-        # print('Date Only : ', list_dates)
         #Get date as of 90 days prior
         prev = date.strftime(today - timedelta(days=90), '%Y-%m-%d')
-        # print(prev)
         # Delete lines that are older than 90 days prior
         if list_dates < prev:
             print(f'{list_dates} older than 90 days. Removing {current_list[_]}')
             with open("/data/Computer_list.txt", "w") as fp:
                 for line in current_list:
-                    # print(current_list[_])
                     if line.strip("\n") != current_list[_]:
                         fp.write("%s\n" % line)
 
@@ -101,8 +97,6 @@ def compare_lists(working_list, current_list):
     compare2 = set(current_list)
 
     missing_machines = list(sorted(compare1 - compare2))
-
-    # print('missing:', missing_machines)
 
     with open(r'/data/Computer_list.txt', 'a') as write_to:
         for item in missing_machines:
