@@ -2,10 +2,10 @@ import os
 import time
 from datetime import date, timedelta
 import sys, getopt
+import csv
 
 today = date.today()
 print("Today's date:", today)
-print(sys.argv)
 argument = sys.argv[1:]
 
 subnet_list = ''
@@ -32,14 +32,12 @@ for opt, arg in opts:
         sys.exit()
     elif opt in ("-s"):
         subnet_list = arg
-        print(subnet_list)
     else:
         print("Not valid program syntax: Try running matchhosts.py -h for help")
 
 print ('Subnets we will scan:', subnet_list)
 
 match_subnet = '10.0.0.0/24'
-print (f'Number of arguments:', len(sys.argv), 'arguments.')
 
 def pull_current_list(working_lines):
     test_data = ''
@@ -58,51 +56,102 @@ def pull_current_list(working_lines):
 
 # if 
 def get_working_list(current_list):
+    # The nmap search command
     nmap_search = f"nmap -sP {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
+
     # found_machines = os.system(nmap_search)
     found_machines = os.popen(nmap_search).read()
+    # found_machines_strip = [x.strip(' ') for x in found_machines]
 
     create_file = open("/data/found.txt","w")
     create_file.write(str(found_machines))
     create_file.close()
 
-    working_list = open('/data/found.txt').read().splitlines()
+    working_pre_list = open('/data/found.txt').read().splitlines()
+    working_list = [x.strip(' ') for x in working_pre_list]
+
     for _ in range(len(working_list)):
         working_list[_] = working_list[_] + f", {today}"
     # Break working list into lines
     working_lines = ('\n'.join(working_list))
 
-    current_list = pull_current_list(working_lines)
-    #remove old entries that haven't been updated
-    remove_old(working_list, current_list)
-    #compare new and old lists, updating final list to add on new entries
-    compare_lists(working_list, current_list)
-    os.remove("/data/found.txt")
+    create_file = open("/data/found_dates.txt","w")
+    create_file.write(str(working_lines))
+    create_file.close()
 
-def remove_old(working_list, current_list):
-    for _ in range(len(current_list)):
-        list_dates = current_list[_][-10:]
+    #Get Current Saved List
+    current_list = pull_current_list(working_lines)
+    
+    #Removing Duplicates (When machines are found 2 days in a row for example)
+    # final_dup_list = remove_dups(working_list)
+    clean_dict = remove_dup_dates(working_lines)
+
+    #remove old entries that haven't been updated
+    remove_old(clean_dict)
+    # Cleaning up!
+    os.remove("/data/found.txt")
+    os.remove("/data/Computer_listtemp.txt")
+    os.remove("/data/edit.txt")
+    os.remove("/data/founddates.txt")
+
+def remove_old(clean_dict):
+
         #Get date as of 90 days prior
-        prev = date.strftime(today - timedelta(days=90), '%Y-%m-%d')
+    prev = date.strftime(today - timedelta(days=90), '%Y-%m-%d')
+    rm_list = open('/data/edit.txt').read().splitlines()
+
+    for _ in range(len(rm_list)):
+        list_dates = rm_list[_][-10:]
+        
         # Delete lines that are older than 90 days prior
         if list_dates < prev:
-            print(f'{list_dates} older than 90 days. Removing {current_list[_]}')
             with open("/data/Computer_list.txt", "w") as fp:
-                for line in current_list:
-                    if line.strip("\n") != current_list[_]:
+                for line in rm_list:
+                    print(f'{list_dates} older than 90 days. Removing {rm_list[_]}')
+                    if line.strip("\n") != rm_list[_]:
                         fp.write("%s\n" % line)
 
-def compare_lists(working_list, current_list):
-    compare1 = set(working_list)
-    compare2 = set(current_list)
+def remove_dup_dates(working_lines):
+    # print(working_lines)
+    current_dict = {}
 
-    missing_machines = list(sorted(compare1 - compare2))
+    #Remove double quotes
+    with open('/data/Computer_list.txt', 'r') as infile, \
+        open('/data/edit.txt', 'w') as outfile:
+        data = infile.read()
+        outfile.write(data)
 
-    with open(r'/data/Computer_list.txt', 'a') as write_to:
-        for item in missing_machines:
-            # write each item on a new line
-            write_to.write("%s\n" % item)
-        print('Done')
+    #Remove new lines
+
+    f = open('/data/edit.txt', 'r')
+    for line in f.readlines():
+        name,dates = line.split(",")
+        current_dict[name] = str(dates)
+
+    new_dict = {}
+    f = open('/data/found_dates.txt', 'r')
+    for line in f.readlines():
+        name,dates = line.split(",")
+        new_dict[name] = str(dates)
+
+    current_dict.update(new_dict)
+
+    clean_dict = {key.strip(): item.strip() for key, item in current_dict.items()}
+
+    with open('/data/Computer_listtemp.txt', 'w') as csv_file:  
+        writer = csv.writer(csv_file, delimiter=',', quotechar='\"')
+        for key, value in current_dict.items():
+            writer.writerow([key, value])
+    
+    #Remove double quotes that writing dict creates
+    with open('/data/Computer_listtemp.txt', 'r') as infile, \
+        open('/data/Computer_list.txt', 'w') as outfile:
+        data = infile.read()
+        data = data.replace('"', "")
+        data = data.replace('\n\n', "\n")
+        outfile.write(data)
+
+    return clean_dict
     
 current_list = 'null'
 get_working_list(current_list)
