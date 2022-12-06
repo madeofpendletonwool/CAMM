@@ -46,5 +46,4 @@ RUN git clone https://github.com/madeofpendletonwool/camm.git && \
 #     #install new cron file
 #     # crontab cammbootcron
 # ENTRYPOINT /bin/bash -c "echo test"
-CMD service cron start
-ENTRYPOINT /bin/bash -c "(crontab -l 2>/dev/null; echo '$RUNTIMER /usr/bin/python3 /camm/CAMM.py -s $SUBNETS') | crontab -" && tail -f /dev/null
+ENTRYPOINT /bin/bash -c "(crontab -l 2>/dev/null; echo '$RUNTIMER /usr/bin/python3 /camm/CAMM.py -s $SUBNETS') | crontab -" && service cron start && tail -f /dev/null
