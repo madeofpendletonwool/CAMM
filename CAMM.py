@@ -92,7 +92,7 @@ def get_working_list(current_list):
     os.remove("/data/found.txt")
     os.remove("/data/Computer_listtemp.txt")
     os.remove("/data/edit.txt")
-    os.remove("/data/founddates.txt")
+    os.remove("/data/found_dates.txt")
 
 def remove_old(clean_dict):
 
