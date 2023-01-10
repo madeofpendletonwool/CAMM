@@ -3,6 +3,7 @@ import time
 from datetime import date, timedelta
 import sys, getopt
 import csv
+import re
 
 today = date.today()
 print("Today's date:", today)
@@ -85,7 +86,8 @@ def get_working_list(current_list):
     #Removing Duplicates (When machines are found 2 days in a row for example)
     # final_dup_list = remove_dups(working_list)
     clean_dict = remove_dup_dates(working_lines)
-
+    #Remove any entries on final list that are ip addresses. We really only want things that have a hostname
+    remove_ips()
     #remove old entries that haven't been updated
     remove_old(clean_dict)
     # Cleaning up!
@@ -94,10 +96,31 @@ def get_working_list(current_list):
     os.remove("/data/edit.txt")
     os.remove("/data/found_dates.txt")
 
+def remove_ips():
+    rm_list = open('/data/Computer_list.txt').read().splitlines()
+
+    # my_list = [('10.0.0.1', '2022-12-05'), ('collincomputer', '2022-12-05')]
+    os.remove("/data/Computer_list.txt")
+
+
+    ip_regex = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+
+    filtered_list = list(filter(lambda x: not ip_regex.match(x.split(',')[0].strip()), rm_list))
+
+    # join all the elements in the list into a single string
+    data = "\n".join(filtered_list)
+    # print(filtered_list)cd 
+
+    # write the string to the file
+    with open('/data/Computer_list.txt', 'w') as f:
+        f.write(data)
+
+
 def remove_old(clean_dict):
 
         #Get date as of 90 days prior
     prev = date.strftime(today - timedelta(days=90), '%Y-%m-%d')
+        # Open current working file
     rm_list = open('/data/edit.txt').read().splitlines()
 
     for _ in range(len(rm_list)):
