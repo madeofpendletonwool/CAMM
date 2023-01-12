@@ -58,7 +58,7 @@ def pull_current_list(working_lines):
 # if 
 def get_working_list(current_list):
     # The nmap search command
-    nmap_search = f"nmap -sP {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
+    nmap_search = f"nmap -sn {subnet_list} | awk -F'for ' '{{print $2}}' | sed 's/(.*//' | sed '/^$/d'"
 
     # found_machines = os.system(nmap_search)
     found_machines = os.popen(nmap_search).read()
